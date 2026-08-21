@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { CUSTOMERS } from "@/lib/mock-data";
+import { exportToCsv } from "@/lib/export-csv";
 
 export default function CustomersPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,6 +18,19 @@ export default function CustomersPage() {
     c.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleExportCsv = () => {
+    exportToCsv("customers_report", filteredCustomers, [
+      { header: "Customer Name", key: "name" },
+      { header: "Phone Number", key: "phone" },
+      { header: "Email Address", key: "email" },
+      { header: "Customer Since", key: "since" },
+      { header: "Lifetime Value (INR)", key: "lifetimeValue", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
+      { header: "Total Bookings", key: "bookingsCount" },
+      { header: "Tags", key: "tags", format: (v) => Array.isArray(v) ? v.join(", ") : v },
+      { header: "Assigned Agent", key: "assignedTo" },
+    ]);
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -25,10 +39,10 @@ export default function CustomersPage() {
           <p className="text-xs sm:text-sm text-muted-foreground">Manage your customer relationships and history.</p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button variant="outline" size="sm" className="hidden sm:flex">
-            <Download className="mr-1.5 h-3.5 w-3.5" /> Export
+          <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
+            <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="shadow-xs">
+          <Button size="sm" className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> New Customer
           </Button>
         </div>

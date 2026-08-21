@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Plus, MoreHorizontal, Star } from "lucide-react";
+import { Search, Filter, Plus, MoreHorizontal, Star, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { SUPPLIERS } from "@/lib/mock-data";
+import { exportToCsv } from "@/lib/export-csv";
 
 export default function SuppliersPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -16,6 +17,18 @@ export default function SuppliersPage() {
     sup.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleExportCsv = () => {
+    exportToCsv("suppliers_report", filteredSuppliers, [
+      { header: "Supplier Name", key: "name" },
+      { header: "Category", key: "category" },
+      { header: "Contact Details", key: "contact" },
+      { header: "Total Business (INR)", key: "totalBusiness", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
+      { header: "Outstanding Balance (INR)", key: "outstanding", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
+      { header: "Rating (Stars)", key: "rating" },
+      { header: "Status", key: "status" },
+    ]);
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -24,7 +37,10 @@ export default function SuppliersPage() {
           <p className="text-xs sm:text-sm text-muted-foreground">Manage your relationships with airlines, hotels, and DMCs.</p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button size="sm" className="shadow-xs">
+          <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
+            <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
+          </Button>
+          <Button size="sm" className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Supplier
           </Button>
         </div>

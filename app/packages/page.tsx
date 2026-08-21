@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Plus, Copy, Eye, PenLine, PowerOff } from "lucide-react";
+import { Search, Filter, Plus, Copy, Eye, PenLine, PowerOff, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { PACKAGES } from "@/lib/mock-data";
+import { exportToCsv } from "@/lib/export-csv";
 
 export default function PackagesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -14,6 +15,17 @@ export default function PackagesPage() {
   const filteredPackages = PACKAGES.filter(pkg =>
     pkg.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleExportCsv = () => {
+    exportToCsv("packages_report", filteredPackages, [
+      { header: "Package Name", key: "name" },
+      { header: "Duration", key: "duration" },
+      { header: "Starting Price (INR)", key: "startingPrice", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
+      { header: "Total Bookings", key: "bookings" },
+      { header: "Revenue Generated (INR)", key: "revenue", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
+      { header: "Status", key: "status" },
+    ]);
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
@@ -23,7 +35,10 @@ export default function PackagesPage() {
           <p className="text-xs sm:text-sm text-muted-foreground">Manage your predefined travel itineraries and pricing.</p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button size="sm" className="shadow-xs">
+          <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
+            <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
+          </Button>
+          <Button size="sm" className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Package
           </Button>
         </div>

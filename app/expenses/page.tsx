@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { EXPENSES } from "@/lib/mock-data";
+import { exportToCsv } from "@/lib/export-csv";
 
 export default function ExpensesPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -17,6 +18,18 @@ export default function ExpensesPage() {
     exp.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const handleExportCsv = () => {
+    exportToCsv("expenses_report", filteredExpenses, [
+      { header: "Expense ID", key: "id" },
+      { header: "Supplier / Vendor", key: "supplier" },
+      { header: "Expense Category", key: "category" },
+      { header: "Amount (INR)", key: "amount", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
+      { header: "Date", key: "date" },
+      { header: "Reference / Note", key: "reference" },
+      { header: "Payment Status", key: "status" },
+    ]);
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -25,10 +38,10 @@ export default function ExpensesPage() {
           <p className="text-xs sm:text-sm text-muted-foreground">Track supplier payments, overheads, and operational costs.</p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button variant="outline" size="sm" className="hidden sm:flex">
-            <Download className="mr-1.5 h-3.5 w-3.5" /> Export
+          <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
+            <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="shadow-xs">
+          <Button size="sm" className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Log Expense
           </Button>
         </div>

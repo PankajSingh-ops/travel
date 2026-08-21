@@ -7,9 +7,34 @@ import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { exportToCsv } from "@/lib/export-csv";
+
+const PAYMENTS_DATA = [
+  { invoice: "INV-2041", customer: "Rahul Sharma", bookingId: "BK-1024", amount: 50000, method: "UPI", status: "Paid", date: "Aug 19, 2026" },
+  { invoice: "INV-2038", customer: "Priya Mehta", bookingId: "BK-1025", amount: 120000, method: "Bank Transfer", status: "Paid", date: "Jul 25, 2026" },
+  { invoice: "INV-2045", customer: "Sneha Reddy", bookingId: "BK-1030", amount: 25000, method: "Pending", status: "Overdue", date: "Aug 15, 2026" },
+];
 
 export default function PaymentsPage() {
   const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredPayments = PAYMENTS_DATA.filter(p =>
+    p.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.invoice.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    p.bookingId.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleExportCsv = () => {
+    exportToCsv("payments_report", filteredPayments, [
+      { header: "Invoice Number", key: "invoice" },
+      { header: "Customer Name", key: "customer" },
+      { header: "Booking Reference", key: "bookingId" },
+      { header: "Amount (INR)", key: "amount", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
+      { header: "Payment Method", key: "method" },
+      { header: "Payment Status", key: "status" },
+      { header: "Transaction Date", key: "date" },
+    ]);
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
@@ -19,10 +44,10 @@ export default function PaymentsPage() {
           <p className="text-xs sm:text-sm text-muted-foreground">Manage collections, invoices and supplier payments.</p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button variant="outline" size="sm" className="hidden sm:flex">
-            <Download className="mr-1.5 h-3.5 w-3.5" /> Export
+          <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
+            <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="shadow-xs">
+          <Button size="sm" className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Record Payment
           </Button>
         </div>
@@ -95,42 +120,28 @@ export default function PaymentsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            <TableRow className="cursor-pointer hover:bg-muted/50">
-              <TableCell className="font-semibold text-primary">INV-2041</TableCell>
-              <TableCell className="font-medium">Rahul Sharma</TableCell>
-              <TableCell className="text-primary font-medium">BK-1024</TableCell>
-              <TableCell className="font-medium text-xs sm:text-sm">₹50,000</TableCell>
-              <TableCell className="text-xs">UPI</TableCell>
-              <TableCell><Badge variant="success" className="text-xs">Paid</Badge></TableCell>
-              <TableCell className="text-xs text-muted-foreground">Aug 19, 2026</TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><MoreHorizontal className="h-4 w-4" /></Button>
-              </TableCell>
-            </TableRow>
-            <TableRow className="cursor-pointer hover:bg-muted/50">
-              <TableCell className="font-semibold text-primary">INV-2038</TableCell>
-              <TableCell className="font-medium">Priya Mehta</TableCell>
-              <TableCell className="text-primary font-medium">BK-1025</TableCell>
-              <TableCell className="font-medium text-xs sm:text-sm">₹1,20,000</TableCell>
-              <TableCell className="text-xs">Bank Transfer</TableCell>
-              <TableCell><Badge variant="success" className="text-xs">Paid</Badge></TableCell>
-              <TableCell className="text-xs text-muted-foreground">Jul 25, 2026</TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><MoreHorizontal className="h-4 w-4" /></Button>
-              </TableCell>
-            </TableRow>
-            <TableRow className="cursor-pointer hover:bg-muted/50">
-              <TableCell className="font-semibold text-primary">INV-2045</TableCell>
-              <TableCell className="font-medium">Sneha Reddy</TableCell>
-              <TableCell className="text-primary font-medium">BK-1030</TableCell>
-              <TableCell className="font-medium text-destructive text-xs sm:text-sm">₹25,000</TableCell>
-              <TableCell className="text-xs">Pending</TableCell>
-              <TableCell><Badge variant="destructive" className="text-xs">Overdue</Badge></TableCell>
-              <TableCell className="text-xs text-muted-foreground">Aug 15, 2026</TableCell>
-              <TableCell className="text-right">
-                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><MoreHorizontal className="h-4 w-4" /></Button>
-              </TableCell>
-            </TableRow>
+            {filteredPayments.map((p, idx) => (
+              <TableRow key={idx} className="cursor-pointer hover:bg-muted/50">
+                <TableCell className="font-semibold text-primary">{p.invoice}</TableCell>
+                <TableCell className="font-medium">{p.customer}</TableCell>
+                <TableCell className="text-primary font-medium">{p.bookingId}</TableCell>
+                <TableCell className={`font-medium text-xs sm:text-sm ${p.status === "Overdue" ? "text-destructive" : ""}`}>
+                  ₹{p.amount.toLocaleString('en-IN')}
+                </TableCell>
+                <TableCell className="text-xs">{p.method}</TableCell>
+                <TableCell>
+                  <Badge variant={p.status === "Paid" ? "success" : "destructive"} className="text-xs">
+                    {p.status}
+                  </Badge>
+                </TableCell>
+                <TableCell className="text-xs text-muted-foreground">{p.date}</TableCell>
+                <TableCell className="text-right">
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </TableCell>
+              </TableRow>
+            ))}
           </TableBody>
         </Table>
       </div>

@@ -22,6 +22,7 @@ import {
   TableRow 
 } from "@/components/ui/table";
 import { LEADS } from "@/lib/mock-data";
+import { exportToCsv } from "@/lib/export-csv";
 
 export default function LeadsPage() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -30,6 +31,22 @@ export default function LeadsPage() {
     lead.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     lead.destination.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+  const handleExportCsv = () => {
+    exportToCsv("leads_report", filteredLeads, [
+      { header: "Customer Name", key: "customerName" },
+      { header: "Phone Number", key: "phone" },
+      { header: "Destination", key: "destination" },
+      { header: "Travel Dates", key: "travelDates" },
+      { header: "Budget (INR)", key: "budget", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
+      { header: "Travelers", key: "travelers" },
+      { header: "Lead Source", key: "source" },
+      { header: "Pipeline Stage", key: "stage" },
+      { header: "Assigned Agent", key: "assignedTo" },
+      { header: "Lead Score", key: "score" },
+      { header: "Last Activity", key: "lastActivity" },
+    ]);
+  };
 
   return (
     <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
@@ -42,12 +59,12 @@ export default function LeadsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button variant="outline" size="sm" className="hidden sm:flex">
-            <Download className="mr-2 h-4 w-4" />
-            Export
+          <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
+            <Download className="mr-1.5 h-3.5 w-3.5" />
+            Export CSV
           </Button>
-          <Button size="sm" className="shadow-xs">
-            <Plus className="mr-2 h-4 w-4" />
+          <Button size="sm" className="h-9 shadow-xs">
+            <Plus className="mr-1.5 h-3.5 w-3.5" />
             New Lead
           </Button>
         </div>

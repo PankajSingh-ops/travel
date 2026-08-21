@@ -16,6 +16,7 @@ import {
   Pie,
   Cell
 } from "recharts";
+import { exportToCsv } from "@/lib/export-csv";
 
 const SOURCE_DATA = [
   { name: "WhatsApp", value: 45, color: "#10b981" },
@@ -33,6 +34,38 @@ const DESTINATION_DATA = [
 ];
 
 export default function AnalyticsPage() {
+  const handleExportReport = () => {
+    // Generate combined analytics dataset
+    const reportData = [
+      // KPI summary
+      { Section: "KPI Summary", Metric: "Average Deal Size", Value: "₹1,40,000", Notes: "+4% from last month" },
+      { Section: "KPI Summary", Metric: "Customer Acquisition Cost (CAC)", Value: "₹850", Notes: "Target: < ₹1,000" },
+      { Section: "KPI Summary", Metric: "Lead Conversion Win Rate", Value: "24.5%", Notes: "+2.1% from last month" },
+      { Section: "KPI Summary", Metric: "Campaign Link Clicks", Value: "12,450", Notes: "Across all marketing campaigns" },
+      // Destination Performance
+      ...DESTINATION_DATA.map(d => ({
+        Section: "Destination Performance",
+        Metric: d.name,
+        Value: `₹${d.revenue} Lakhs`,
+        Notes: `Revenue share`
+      })),
+      // Lead Sources
+      ...SOURCE_DATA.map(s => ({
+        Section: "Lead Acquisition Source",
+        Metric: s.name,
+        Value: `${s.value}%`,
+        Notes: `Inquiry channel share`
+      }))
+    ];
+
+    exportToCsv("analytics_report", reportData, [
+      { header: "Report Section", key: "Section" },
+      { header: "Metric / Category", key: "Metric" },
+      { header: "Value", key: "Value" },
+      { header: "Notes / Context", key: "Notes" }
+    ]);
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 sm:mb-6">
@@ -41,8 +74,8 @@ export default function AnalyticsPage() {
           <p className="text-xs sm:text-sm text-muted-foreground">Detailed insights into your business performance.</p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button variant="outline" size="sm" className="h-9">
-            <Download className="mr-1.5 h-3.5 w-3.5" /> Export Report
+          <Button variant="outline" size="sm" onClick={handleExportReport} className="h-9">
+            <Download className="mr-1.5 h-3.5 w-3.5" /> Export Report (CSV)
           </Button>
         </div>
       </div>

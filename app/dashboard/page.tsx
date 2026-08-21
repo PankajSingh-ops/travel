@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { exportToCsv } from "@/lib/export-csv";
 
 const REVENUE_DATA = [
   { name: "Jan", revenue: 400000 },
@@ -41,7 +42,47 @@ const REVENUE_DATA = [
   { name: "Dec", revenue: 950000 },
 ];
 
+const FUNNEL_DATA = [
+  { stage: "New Leads", count: 248, amount: "₹4.2Cr", color: "bg-blue-500", percent: "100%" },
+  { stage: "Contacted", count: 182, amount: "₹3.1Cr", color: "bg-indigo-500", percent: "73%" },
+  { stage: "Req. Collected", count: 145, amount: "₹2.8Cr", color: "bg-purple-500", percent: "58%" },
+  { stage: "Quotation Sent", count: 112, amount: "₹2.1Cr", color: "bg-pink-500", percent: "45%" },
+  { stage: "Negotiation", count: 64, amount: "₹1.1Cr", color: "bg-orange-500", percent: "25%" },
+  { stage: "Advance Paid", count: 42, amount: "₹72L", color: "bg-amber-500", percent: "16%" },
+  { stage: "Booked", count: 38, amount: "₹65L", color: "bg-success", percent: "15%" },
+];
+
 export default function Dashboard() {
+  const handleExportDashboard = () => {
+    const dashboardExport = [
+      { Section: "Monthly Revenue", Metric: "Jan", Value: "₹4,00,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Feb", Value: "₹3,00,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Mar", Value: "₹2,00,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Apr", Value: "₹2,78,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "May", Value: "₹1,89,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Jun", Value: "₹2,39,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Jul", Value: "₹3,49,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Aug", Value: "₹5,00,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Sep", Value: "₹6,00,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Oct", Value: "₹7,00,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Nov", Value: "₹8,00,000", ConversionRate: "-" },
+      { Section: "Monthly Revenue", Metric: "Dec", Value: "₹9,50,000", ConversionRate: "-" },
+      ...FUNNEL_DATA.map(f => ({
+        Section: "Sales Funnel Stage",
+        Metric: f.stage,
+        Value: `${f.count} leads (${f.amount})`,
+        ConversionRate: f.percent
+      }))
+    ];
+
+    exportToCsv("dashboard_summary", dashboardExport, [
+      { header: "Report Section", key: "Section" },
+      { header: "Metric / Stage", key: "Metric" },
+      { header: "Value / Revenue", key: "Value" },
+      { header: "Conversion Rate", key: "ConversionRate" }
+    ]);
+  };
+
   return (
     <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
       {/* Header */}
@@ -53,12 +94,12 @@ export default function Dashboard() {
           </p>
         </div>
         <div className="flex items-center gap-2 self-start sm:self-auto">
-          <Button variant="outline" size="sm" className="hidden sm:flex">
-            <Download className="mr-2 h-4 w-4" />
-            Export
+          <Button variant="outline" size="sm" onClick={handleExportDashboard} className="h-9">
+            <Download className="mr-1.5 h-3.5 w-3.5" />
+            Export CSV
           </Button>
-          <Button size="sm" className="shadow-xs">
-            <Plus className="mr-2 h-4 w-4" />
+          <Button size="sm" className="h-9 shadow-xs">
+            <Plus className="mr-1.5 h-3.5 w-3.5" />
             New Lead
           </Button>
         </div>
@@ -202,15 +243,7 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="p-4 sm:p-6 pt-2">
             <div className="space-y-4 sm:space-y-5">
-              {[
-                { stage: "New Leads", count: 248, amount: "₹4.2Cr", color: "bg-blue-500", percent: "100%" },
-                { stage: "Contacted", count: 182, amount: "₹3.1Cr", color: "bg-indigo-500", percent: "73%" },
-                { stage: "Req. Collected", count: 145, amount: "₹2.8Cr", color: "bg-purple-500", percent: "58%" },
-                { stage: "Quotation Sent", count: 112, amount: "₹2.1Cr", color: "bg-pink-500", percent: "45%" },
-                { stage: "Negotiation", count: 64, amount: "₹1.1Cr", color: "bg-orange-500", percent: "25%" },
-                { stage: "Advance Paid", count: 42, amount: "₹72L", color: "bg-amber-500", percent: "16%" },
-                { stage: "Booked", count: 38, amount: "₹65L", color: "bg-success", percent: "15%" },
-              ].map((step, i) => (
+              {FUNNEL_DATA.map((step, i) => (
                 <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
                   <div className="flex items-center justify-between sm:w-[120px] text-xs sm:text-sm font-medium">
                     <span>{step.stage}</span>
