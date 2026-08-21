@@ -8,17 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { exportToCsv } from "@/lib/export-csv";
-
-const PAYMENTS_DATA = [
-  { invoice: "INV-2041", customer: "Rahul Sharma", bookingId: "BK-1024", amount: 50000, method: "UPI", status: "Paid", date: "Aug 19, 2026" },
-  { invoice: "INV-2038", customer: "Priya Mehta", bookingId: "BK-1025", amount: 120000, method: "Bank Transfer", status: "Paid", date: "Jul 25, 2026" },
-  { invoice: "INV-2045", customer: "Sneha Reddy", bookingId: "BK-1030", amount: 25000, method: "Pending", status: "Overdue", date: "Aug 15, 2026" },
-];
+import { useCRM } from "@/lib/crm-store";
 
 export default function PaymentsPage() {
+  const { payments, openDrawer } = useCRM();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredPayments = PAYMENTS_DATA.filter(p =>
+  const filteredPayments = payments.filter(p =>
     p.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.invoice.toLowerCase().includes(searchTerm.toLowerCase()) ||
     p.bookingId.toLowerCase().includes(searchTerm.toLowerCase())
@@ -36,6 +32,9 @@ export default function PaymentsPage() {
     ]);
   };
 
+  const totalCollected = payments.filter(p => p.status === "Paid").reduce((sum, p) => sum + p.amount, 0);
+  const totalPending = payments.filter(p => p.status !== "Paid").reduce((sum, p) => sum + p.amount, 0);
+
   return (
     <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -47,7 +46,7 @@ export default function PaymentsPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
             <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="h-9 shadow-xs">
+          <Button size="sm" onClick={() => openDrawer("payment")} className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Record Payment
           </Button>
         </div>
@@ -59,23 +58,23 @@ export default function PaymentsPage() {
             <CardTitle className="text-xs sm:text-sm text-muted-foreground">Total Receivable</CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <div className="text-xl sm:text-2xl font-bold text-primary">₹14.2L</div>
+            <div className="text-xl sm:text-2xl font-bold text-primary">₹{((totalCollected + totalPending) / 100000).toFixed(1)}L</div>
           </CardContent>
         </Card>
         <Card className="shadow-xs">
           <CardHeader className="p-4 pb-1 sm:pb-2">
-            <CardTitle className="text-xs sm:text-sm text-muted-foreground">Collected This Month</CardTitle>
+            <CardTitle className="text-xs sm:text-sm text-muted-foreground">Collected</CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <div className="text-xl sm:text-2xl font-bold text-success">₹8.5L</div>
+            <div className="text-xl sm:text-2xl font-bold text-success">₹{(totalCollected / 100000).toFixed(1)}L</div>
           </CardContent>
         </Card>
         <Card className="shadow-xs">
           <CardHeader className="p-4 pb-1 sm:pb-2">
-            <CardTitle className="text-xs sm:text-sm text-muted-foreground">Overdue</CardTitle>
+            <CardTitle className="text-xs sm:text-sm text-muted-foreground">Pending / Overdue</CardTitle>
           </CardHeader>
           <CardContent className="p-4 pt-0">
-            <div className="text-xl sm:text-2xl font-bold text-destructive">₹2.1L</div>
+            <div className="text-xl sm:text-2xl font-bold text-destructive">₹{(totalPending / 100000).toFixed(1)}L</div>
           </CardContent>
         </Card>
         <Card className="shadow-xs">
@@ -136,9 +135,7 @@ export default function PaymentsPage() {
                 </TableCell>
                 <TableCell className="text-xs text-muted-foreground">{p.date}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><MoreHorizontal className="h-4 w-4" /></Button>
                 </TableCell>
               </TableRow>
             ))}

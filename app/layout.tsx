@@ -4,6 +4,8 @@ import "./globals.css";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { SidebarProvider } from "@/lib/sidebar-context";
+import { CRMProvider } from "@/lib/crm-store";
+import { CRMDrawersManager } from "@/components/drawers/CRMDrawersManager";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,15 +34,18 @@ export default function RootLayout({
     >
       <body className="flex h-screen w-screen overflow-hidden bg-background text-foreground">
         <SidebarProvider>
-          <div className="flex h-full w-full overflow-hidden">
-            <Sidebar />
-            <div className="flex flex-1 flex-col overflow-hidden min-w-0">
-              <TopBar />
-              <main className="flex-1 overflow-y-auto bg-muted/20">
-                {children}
-              </main>
+          <CRMProvider>
+            <div className="flex h-full w-full overflow-hidden">
+              <Sidebar />
+              <div className="flex flex-1 flex-col overflow-hidden min-w-0">
+                <TopBar />
+                <main className="flex-1 overflow-y-auto bg-muted/20">
+                  {children}
+                </main>
+              </div>
             </div>
-          </div>
+            <CRMDrawersManager />
+          </CRMProvider>
         </SidebarProvider>
       </body>
     </html>

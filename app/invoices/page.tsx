@@ -1,18 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Download, Plus, MoreHorizontal } from "lucide-react";
+import { Search, Filter, Download, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { INVOICES } from "@/lib/mock-data";
 import { exportToCsv } from "@/lib/export-csv";
+import { useCRM } from "@/lib/crm-store";
 
 export default function InvoicesPage() {
+  const { invoices, openDrawer, deleteInvoice } = useCRM();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredInvoices = INVOICES.filter(inv =>
+  const filteredInvoices = invoices.filter(inv =>
     inv.customer.toLowerCase().includes(searchTerm.toLowerCase()) ||
     inv.id.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -40,7 +41,7 @@ export default function InvoicesPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
             <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="h-9 shadow-xs">
+          <Button size="sm" onClick={() => openDrawer("invoice")} className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Create Invoice
           </Button>
         </div>
@@ -81,29 +82,43 @@ export default function InvoicesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredInvoices.map((invoice) => (
-              <TableRow key={invoice.id} className="cursor-pointer hover:bg-muted/50">
-                <TableCell className="font-semibold text-primary">{invoice.id}</TableCell>
-                <TableCell className="font-medium">{invoice.customer}</TableCell>
-                <TableCell className="text-xs">{invoice.bookingId}</TableCell>
-                <TableCell className="font-medium text-xs sm:text-sm">₹{(invoice.amount).toLocaleString('en-IN')}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{invoice.issueDate}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{invoice.dueDate}</TableCell>
-                <TableCell>
-                  <Badge 
-                    variant={invoice.status === "Paid" ? "success" : invoice.status === "Partially Paid" ? "warning" : "secondary"}
-                    className="text-xs"
-                  >
-                    {invoice.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+            {filteredInvoices.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground text-xs sm:text-sm">
+                  No invoices generated yet. Click <span className="font-semibold text-primary cursor-pointer underline" onClick={() => openDrawer("invoice")}>Create Invoice</span> to create one!
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredInvoices.map((invoice) => (
+                <TableRow key={invoice.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableCell className="font-semibold text-primary">{invoice.id}</TableCell>
+                  <TableCell className="font-medium">{invoice.customer}</TableCell>
+                  <TableCell className="text-xs">{invoice.bookingId}</TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm">₹{(invoice.amount).toLocaleString('en-IN')}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{invoice.issueDate}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{invoice.dueDate}</TableCell>
+                  <TableCell>
+                    <Badge 
+                      variant={invoice.status === "Paid" ? "success" : invoice.status === "Partially Paid" ? "warning" : "secondary"}
+                      className="text-xs"
+                    >
+                      {invoice.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => deleteInvoice(invoice.id)}
+                      title="Delete Invoice"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

@@ -9,15 +9,27 @@ import {
   Mail, 
   Download, 
   Plus, 
-  Trash2
+  Trash2,
+  Check
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useCRM } from "@/lib/crm-store";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function NewQuotation() {
+  const router = useRouter();
+  const { addQuotation, addBooking } = useCRM();
+
+  const [customerName, setCustomerName] = useState("Rahul Sharma");
+  const [destination, setDestination] = useState("Dubai Premium Escape");
+  const [travelDates, setTravelDates] = useState("Sep 12 - Sep 18, 2026");
+  const [travelers, setTravelers] = useState("2 Adults");
+  const [isSuccess, setIsSuccess] = useState(false);
+
   const [items, setItems] = useState([
     { id: 1, type: "Flights", description: "Return tickets DXB-DEL", qty: 2, price: 25000, tax: 18, total: 59000 },
     { id: 2, type: "Hotels", description: "JW Marriott 4 Nights (Double Room)", qty: 1, price: 60000, tax: 18, total: 70800 },
@@ -33,6 +45,37 @@ export default function NewQuotation() {
 
   const removeItem = (id: number) => {
     setItems(items.filter(i => i.id !== id));
+  };
+
+  const handleSaveQuotation = (status: "Draft" | "Sent" = "Sent") => {
+    addQuotation({
+      customerName: customerName || "Rahul Sharma",
+      destination: destination || "Custom Tour",
+      amount: total,
+      status: status,
+    });
+    setIsSuccess(true);
+    setTimeout(() => {
+      router.push("/quotations");
+    }, 600);
+  };
+
+  const handleConvertToBooking = () => {
+    addBooking({
+      customerName: customerName || "Rahul Sharma",
+      destination: destination || "Custom Tour",
+      travelDates: travelDates,
+      travelers: travelers,
+      amount: total,
+      paid: Math.round(total * 0.3),
+      pending: Math.round(total * 0.7),
+      status: "Partially Paid",
+      assignedTo: "Amit",
+    });
+    setIsSuccess(true);
+    setTimeout(() => {
+      router.push("/bookings");
+    }, 600);
   };
 
   return (
@@ -51,17 +94,20 @@ export default function NewQuotation() {
           </div>
         </div>
         <div className="flex items-center flex-wrap gap-2">
-          <Button variant="outline" size="sm" className="h-9">
+          <Button variant="outline" size="sm" onClick={() => handleSaveQuotation("Draft")} className="h-9">
             <Save className="mr-1.5 h-3.5 w-3.5" /> Save Draft
           </Button>
-          <Button variant="outline" size="sm" className="h-9">
-            <Eye className="mr-1.5 h-3.5 w-3.5" /> Preview
-          </Button>
-          <Button size="sm" className="h-9 bg-success text-success-foreground hover:bg-success/90">
-            <MessageCircle className="mr-1.5 h-3.5 w-3.5" /> Send WhatsApp
+          <Button size="sm" onClick={() => handleSaveQuotation("Sent")} className="h-9 bg-success text-success-foreground hover:bg-success/90">
+            <MessageCircle className="mr-1.5 h-3.5 w-3.5" /> Send & Save
           </Button>
         </div>
       </div>
+
+      {isSuccess && (
+        <div className="bg-success/10 border border-success/20 text-success p-3 rounded-lg flex items-center gap-2 text-xs sm:text-sm font-medium animate-in fade-in">
+          <Check className="h-4 w-4" /> Quotation saved successfully! Redirecting...
+        </div>
+      )}
 
       <div className="grid gap-6 grid-cols-1 lg:grid-cols-3">
         <div className="lg:col-span-2 space-y-6">
@@ -72,20 +118,40 @@ export default function NewQuotation() {
             <CardContent className="p-4 sm:p-6 pt-0">
               <div className="grid gap-4 grid-cols-1 sm:grid-cols-2">
                 <div className="space-y-1.5">
-                  <label className="text-xs sm:text-sm font-medium">Customer</label>
-                  <Input placeholder="Select or type customer name" defaultValue="Rahul Sharma" className="h-9 text-xs sm:text-sm" />
+                  <label className="text-xs sm:text-sm font-medium">Customer Name</label>
+                  <Input 
+                    placeholder="Select or type customer name" 
+                    value={customerName} 
+                    onChange={(e) => setCustomerName(e.target.value)} 
+                    className="h-9 text-xs sm:text-sm" 
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs sm:text-sm font-medium">Destination</label>
-                  <Input placeholder="e.g. Dubai" defaultValue="Dubai" className="h-9 text-xs sm:text-sm" />
+                  <Input 
+                    placeholder="e.g. Dubai" 
+                    value={destination} 
+                    onChange={(e) => setDestination(e.target.value)} 
+                    className="h-9 text-xs sm:text-sm" 
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs sm:text-sm font-medium">Travel Date</label>
-                  <Input placeholder="Select dates" defaultValue="Sep 12 - Sep 18, 2026" className="h-9 text-xs sm:text-sm" />
+                  <Input 
+                    placeholder="Select dates" 
+                    value={travelDates} 
+                    onChange={(e) => setTravelDates(e.target.value)} 
+                    className="h-9 text-xs sm:text-sm" 
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-xs sm:text-sm font-medium">Travelers</label>
-                  <Input placeholder="e.g. 2 Adults, 1 Child" defaultValue="2 Adults" className="h-9 text-xs sm:text-sm" />
+                  <Input 
+                    placeholder="e.g. 2 Adults, 1 Child" 
+                    value={travelers} 
+                    onChange={(e) => setTravelers(e.target.value)} 
+                    className="h-9 text-xs sm:text-sm" 
+                  />
                 </div>
               </div>
             </CardContent>
@@ -196,7 +262,7 @@ export default function NewQuotation() {
               <Button variant="outline" className="w-full justify-start text-xs sm:text-sm h-9">
                 <Mail className="mr-2 h-4 w-4" /> Send Email
               </Button>
-              <Button className="w-full justify-start bg-primary text-primary-foreground mt-3 text-xs sm:text-sm h-9">
+              <Button onClick={handleConvertToBooking} className="w-full justify-start bg-primary text-primary-foreground mt-3 text-xs sm:text-sm h-9">
                 Convert to Booking
               </Button>
             </CardContent>

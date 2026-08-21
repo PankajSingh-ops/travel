@@ -1,18 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Download, Plus, MoreHorizontal } from "lucide-react";
+import { Search, Filter, Download, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { BOOKINGS } from "@/lib/mock-data";
 import { exportToCsv } from "@/lib/export-csv";
+import { useCRM } from "@/lib/crm-store";
 
 export default function BookingsPage() {
+  const { bookings, openDrawer, deleteBooking } = useCRM();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredBookings = BOOKINGS.filter(b =>
+  const filteredBookings = bookings.filter(b =>
     b.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     b.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
     b.id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -25,6 +26,7 @@ export default function BookingsPage() {
       { header: "Destination", key: "destination" },
       { header: "Travel Dates", key: "travelDates" },
       { header: "Total Amount (INR)", key: "amount", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
+      { header: "Paid Amount (INR)", key: "paid", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
       { header: "Pending Amount (INR)", key: "pending", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
       { header: "Booking Status", key: "status" },
       { header: "Assigned Agent", key: "assignedTo" },
@@ -42,7 +44,7 @@ export default function BookingsPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
             <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="h-9 shadow-xs">
+          <Button size="sm" onClick={() => openDrawer("booking")} className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> New Booking
           </Button>
         </div>
@@ -83,29 +85,43 @@ export default function BookingsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredBookings.map((booking) => (
-              <TableRow key={booking.id} className="cursor-pointer hover:bg-muted/50">
-                <TableCell className="font-semibold text-primary">{booking.id}</TableCell>
-                <TableCell className="font-medium">{booking.customerName}</TableCell>
-                <TableCell>{booking.destination}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{booking.travelDates}</TableCell>
-                <TableCell>
-                  <div className="font-medium">₹{(booking.amount).toLocaleString('en-IN')}</div>
-                  <div className="text-[11px] text-muted-foreground">Pending: ₹{(booking.pending).toLocaleString('en-IN')}</div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={booking.status === "Confirmed" ? "success" : "warning"} className="text-xs">
-                    {booking.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-xs">{booking.assignedTo}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+            {filteredBookings.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground text-xs sm:text-sm">
+                  No bookings recorded yet. Click <span className="font-semibold text-primary cursor-pointer underline" onClick={() => openDrawer("booking")}>New Booking</span> to add one!
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredBookings.map((booking) => (
+                <TableRow key={booking.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableCell className="font-semibold text-primary">{booking.id}</TableCell>
+                  <TableCell className="font-medium">{booking.customerName}</TableCell>
+                  <TableCell>{booking.destination}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{booking.travelDates}</TableCell>
+                  <TableCell>
+                    <div className="font-medium">₹{(booking.amount).toLocaleString('en-IN')}</div>
+                    <div className="text-[11px] text-muted-foreground">Pending: ₹{(booking.pending).toLocaleString('en-IN')}</div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={booking.status === "Confirmed" ? "success" : "warning"} className="text-xs">
+                      {booking.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-xs">{booking.assignedTo}</TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => deleteBooking(booking.id)}
+                      title="Delete Booking"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

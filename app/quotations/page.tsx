@@ -6,14 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { QUOTATIONS } from "@/lib/mock-data";
 import { exportToCsv } from "@/lib/export-csv";
+import { useCRM } from "@/lib/crm-store";
 import Link from "next/link";
 
 export default function QuotationsPage() {
+  const { quotations } = useCRM();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredQuotes = QUOTATIONS.filter(quote => 
+  const filteredQuotes = quotations.filter(quote => 
     quote.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     quote.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
     quote.id.toLowerCase().includes(searchTerm.toLowerCase())

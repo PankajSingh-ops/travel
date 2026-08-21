@@ -1,18 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Download, Plus, MoreHorizontal } from "lucide-react";
+import { Search, Filter, Download, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { CUSTOMERS } from "@/lib/mock-data";
 import { exportToCsv } from "@/lib/export-csv";
+import { useCRM } from "@/lib/crm-store";
 
 export default function CustomersPage() {
+  const { customers, openDrawer, deleteCustomer } = useCRM();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredCustomers = CUSTOMERS.filter(c =>
+  const filteredCustomers = customers.filter(c =>
     c.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.phone.toLowerCase().includes(searchTerm.toLowerCase()) ||
     c.email.toLowerCase().includes(searchTerm.toLowerCase())
@@ -20,6 +21,7 @@ export default function CustomersPage() {
 
   const handleExportCsv = () => {
     exportToCsv("customers_report", filteredCustomers, [
+      { header: "Customer ID", key: "id" },
       { header: "Customer Name", key: "name" },
       { header: "Phone Number", key: "phone" },
       { header: "Email Address", key: "email" },
@@ -42,7 +44,7 @@ export default function CustomersPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
             <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="h-9 shadow-xs">
+          <Button size="sm" onClick={() => openDrawer("customer")} className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> New Customer
           </Button>
         </div>
@@ -83,31 +85,45 @@ export default function CustomersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredCustomers.map((customer) => (
-              <TableRow key={customer.id} className="cursor-pointer hover:bg-muted/50">
-                <TableCell className="font-semibold">{customer.name}</TableCell>
-                <TableCell>
-                  <div className="text-xs sm:text-sm">{customer.phone}</div>
-                  <div className="text-[11px] text-muted-foreground">{customer.email}</div>
-                </TableCell>
-                <TableCell className="text-xs text-muted-foreground">{customer.since}</TableCell>
-                <TableCell className="font-medium text-xs sm:text-sm">₹{(customer.lifetimeValue).toLocaleString('en-IN')}</TableCell>
-                <TableCell className="text-xs sm:text-sm font-medium">{customer.bookingsCount}</TableCell>
-                <TableCell>
-                  <div className="flex flex-wrap gap-1">
-                    {customer.tags.map(tag => (
-                      <Badge key={tag} variant="outline" className="text-[10px] font-normal bg-muted">{tag}</Badge>
-                    ))}
-                  </div>
-                </TableCell>
-                <TableCell className="text-xs">{customer.assignedTo}</TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+            {filteredCustomers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground text-xs sm:text-sm">
+                  No customers found. Click <span className="font-semibold text-primary cursor-pointer underline" onClick={() => openDrawer("customer")}>New Customer</span> to add one!
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredCustomers.map((customer) => (
+                <TableRow key={customer.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableCell className="font-semibold">{customer.name}</TableCell>
+                  <TableCell>
+                    <div className="text-xs sm:text-sm">{customer.phone}</div>
+                    <div className="text-[11px] text-muted-foreground">{customer.email}</div>
+                  </TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{customer.since}</TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm">₹{(customer.lifetimeValue).toLocaleString('en-IN')}</TableCell>
+                  <TableCell className="text-xs sm:text-sm font-medium">{customer.bookingsCount}</TableCell>
+                  <TableCell>
+                    <div className="flex flex-wrap gap-1">
+                      {customer.tags.map(tag => (
+                        <Badge key={tag} variant="outline" className="text-[10px] font-normal bg-muted">{tag}</Badge>
+                      ))}
+                    </div>
+                  </TableCell>
+                  <TableCell className="text-xs">{customer.assignedTo}</TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => deleteCustomer(customer.id)}
+                      title="Delete Customer"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

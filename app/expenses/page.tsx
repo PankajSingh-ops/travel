@@ -1,18 +1,19 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Download, Plus, MoreHorizontal } from "lucide-react";
+import { Search, Filter, Download, Plus, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { EXPENSES } from "@/lib/mock-data";
 import { exportToCsv } from "@/lib/export-csv";
+import { useCRM } from "@/lib/crm-store";
 
 export default function ExpensesPage() {
+  const { expenses, openDrawer, deleteExpense } = useCRM();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredExpenses = EXPENSES.filter(exp =>
+  const filteredExpenses = expenses.filter(exp =>
     exp.supplier.toLowerCase().includes(searchTerm.toLowerCase()) ||
     exp.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
     exp.id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -41,7 +42,7 @@ export default function ExpensesPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
             <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="h-9 shadow-xs">
+          <Button size="sm" onClick={() => openDrawer("expense")} className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Log Expense
           </Button>
         </div>
@@ -82,26 +83,40 @@ export default function ExpensesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredExpenses.map((expense) => (
-              <TableRow key={expense.id} className="cursor-pointer hover:bg-muted/50">
-                <TableCell className="font-semibold text-primary">{expense.id}</TableCell>
-                <TableCell className="font-medium">{expense.supplier}</TableCell>
-                <TableCell className="text-xs">{expense.category}</TableCell>
-                <TableCell className="font-medium text-xs sm:text-sm">₹{(expense.amount).toLocaleString('en-IN')}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{expense.date}</TableCell>
-                <TableCell className="text-xs text-muted-foreground">{expense.reference}</TableCell>
-                <TableCell>
-                  <Badge variant={expense.status === "Paid" ? "success" : "warning"} className="text-xs">
-                    {expense.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+            {filteredExpenses.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground text-xs sm:text-sm">
+                  No expenses logged yet. Click <span className="font-semibold text-primary cursor-pointer underline" onClick={() => openDrawer("expense")}>Log Expense</span> to record one!
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredExpenses.map((expense) => (
+                <TableRow key={expense.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableCell className="font-semibold text-primary">{expense.id}</TableCell>
+                  <TableCell className="font-medium">{expense.supplier}</TableCell>
+                  <TableCell className="text-xs">{expense.category}</TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm">₹{(expense.amount).toLocaleString('en-IN')}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{expense.date}</TableCell>
+                  <TableCell className="text-xs text-muted-foreground">{expense.reference}</TableCell>
+                  <TableCell>
+                    <Badge variant={expense.status === "Paid" ? "success" : "warning"} className="text-xs">
+                      {expense.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => deleteExpense(expense.id)}
+                      title="Delete Expense"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

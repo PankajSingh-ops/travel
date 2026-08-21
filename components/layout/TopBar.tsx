@@ -6,9 +6,11 @@ import { Input } from "../ui/input";
 import { Button } from "../ui/button";
 import { Avatar } from "../ui/avatar";
 import { useSidebar } from "../../lib/sidebar-context";
+import { useLeads } from "../../lib/leads-store";
 
 export function TopBar() {
   const { toggleMobile } = useSidebar();
+  const { openNewLeadModal } = useLeads();
 
   return (
     <header className="flex h-16 shrink-0 items-center justify-between border-b bg-background px-3 sm:px-6 gap-2 sm:gap-4 z-30">
@@ -57,7 +59,7 @@ export function TopBar() {
           <span className="absolute right-2 top-2 flex h-2 w-2 rounded-full bg-destructive"></span>
         </Button>
 
-        <Button size="sm" className="gap-1 rounded-full shadow-xs px-2.5 sm:px-4 h-8 sm:h-9">
+        <Button size="sm" onClick={openNewLeadModal} className="gap-1 rounded-full shadow-xs px-2.5 sm:px-4 h-8 sm:h-9">
           <Plus className="h-4 w-4" />
           <span className="hidden sm:inline text-xs sm:text-sm">Create</span>
         </Button>

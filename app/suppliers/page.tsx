@@ -1,24 +1,26 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Plus, MoreHorizontal, Star, Download } from "lucide-react";
+import { Search, Filter, Plus, Trash2, Star, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { SUPPLIERS } from "@/lib/mock-data";
 import { exportToCsv } from "@/lib/export-csv";
+import { useCRM } from "@/lib/crm-store";
 
 export default function SuppliersPage() {
+  const { suppliers, openDrawer, deleteSupplier } = useCRM();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredSuppliers = SUPPLIERS.filter(sup =>
+  const filteredSuppliers = suppliers.filter(sup =>
     sup.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     sup.category.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleExportCsv = () => {
     exportToCsv("suppliers_report", filteredSuppliers, [
+      { header: "Supplier ID", key: "id" },
       { header: "Supplier Name", key: "name" },
       { header: "Category", key: "category" },
       { header: "Contact Details", key: "contact" },
@@ -40,7 +42,7 @@ export default function SuppliersPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
             <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="h-9 shadow-xs">
+          <Button size="sm" onClick={() => openDrawer("supplier")} className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Supplier
           </Button>
         </div>
@@ -81,33 +83,47 @@ export default function SuppliersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredSuppliers.map((sup) => (
-              <TableRow key={sup.id} className="cursor-pointer hover:bg-muted/50">
-                <TableCell className="font-semibold text-primary">{sup.name}</TableCell>
-                <TableCell className="text-xs sm:text-sm">{sup.category}</TableCell>
-                <TableCell className="text-xs">{sup.contact}</TableCell>
-                <TableCell className="font-medium text-xs sm:text-sm">₹{(sup.totalBusiness).toLocaleString('en-IN')}</TableCell>
-                <TableCell className={sup.outstanding > 0 ? "font-semibold text-destructive text-xs sm:text-sm" : "font-medium text-muted-foreground text-xs sm:text-sm"}>
-                  ₹{(sup.outstanding).toLocaleString('en-IN')}
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center text-xs sm:text-sm">
-                    <Star className="h-3.5 w-3.5 text-warning fill-warning mr-1" />
-                    {sup.rating}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Badge variant={sup.status === "Active" ? "success" : "secondary"} className="text-xs">
-                    {sup.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+            {filteredSuppliers.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={8} className="text-center py-8 text-muted-foreground text-xs sm:text-sm">
+                  No suppliers found. Click <span className="font-semibold text-primary cursor-pointer underline" onClick={() => openDrawer("supplier")}>Add Supplier</span> to add one!
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredSuppliers.map((sup) => (
+                <TableRow key={sup.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableCell className="font-semibold text-primary">{sup.name}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{sup.category}</TableCell>
+                  <TableCell className="text-xs">{sup.contact}</TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm">₹{(sup.totalBusiness).toLocaleString('en-IN')}</TableCell>
+                  <TableCell className={sup.outstanding > 0 ? "font-semibold text-destructive text-xs sm:text-sm" : "font-medium text-muted-foreground text-xs sm:text-sm"}>
+                    ₹{(sup.outstanding).toLocaleString('en-IN')}
+                  </TableCell>
+                  <TableCell>
+                    <div className="flex items-center text-xs sm:text-sm">
+                      <Star className="h-3.5 w-3.5 text-warning fill-warning mr-1" />
+                      {sup.rating}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={sup.status === "Active" ? "success" : "secondary"} className="text-xs">
+                      {sup.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => deleteSupplier(sup.id)}
+                      title="Delete Supplier"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

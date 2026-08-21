@@ -26,6 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { exportToCsv } from "@/lib/export-csv";
+import { useLeads } from "@/lib/leads-store";
 
 const REVENUE_DATA = [
   { name: "Jan", revenue: 400000 },
@@ -53,6 +54,8 @@ const FUNNEL_DATA = [
 ];
 
 export default function Dashboard() {
+  const { openNewLeadModal } = useLeads();
+
   const handleExportDashboard = () => {
     const dashboardExport = [
       { Section: "Monthly Revenue", Metric: "Jan", Value: "₹4,00,000", ConversionRate: "-" },
@@ -98,7 +101,7 @@ export default function Dashboard() {
             <Download className="mr-1.5 h-3.5 w-3.5" />
             Export CSV
           </Button>
-          <Button size="sm" className="h-9 shadow-xs">
+          <Button size="sm" onClick={openNewLeadModal} className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" />
             New Lead
           </Button>

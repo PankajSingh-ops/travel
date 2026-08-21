@@ -1,23 +1,25 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Plus, MoreHorizontal, Download } from "lucide-react";
+import { Search, Filter, Plus, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { DESTINATIONS } from "@/lib/mock-data";
 import { exportToCsv } from "@/lib/export-csv";
+import { useCRM } from "@/lib/crm-store";
 
 export default function DestinationsPage() {
+  const { destinations, openDrawer, deleteDestination } = useCRM();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredDestinations = DESTINATIONS.filter(dst =>
+  const filteredDestinations = destinations.filter(dst =>
     dst.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleExportCsv = () => {
     exportToCsv("destinations_report", filteredDestinations, [
+      { header: "Destination ID", key: "id" },
       { header: "Destination Name", key: "name" },
       { header: "Active Packages Count", key: "activePackages" },
       { header: "Total Leads Generated", key: "totalLeads" },
@@ -38,7 +40,7 @@ export default function DestinationsPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
             <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="h-9 shadow-xs">
+          <Button size="sm" onClick={() => openDrawer("destination")} className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Destination
           </Button>
         </div>
@@ -78,25 +80,39 @@ export default function DestinationsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredDestinations.map((dst) => (
-              <TableRow key={dst.id} className="cursor-pointer hover:bg-muted/50">
-                <TableCell className="font-semibold text-primary">{dst.name}</TableCell>
-                <TableCell className="text-xs sm:text-sm">{dst.activePackages}</TableCell>
-                <TableCell className="text-xs sm:text-sm">{dst.totalLeads}</TableCell>
-                <TableCell className="text-xs sm:text-sm">{dst.bookings}</TableCell>
-                <TableCell className="font-medium text-xs sm:text-sm">₹{(dst.revenue).toLocaleString('en-IN')}</TableCell>
-                <TableCell>
-                  <Badge variant={dst.status === "Active" ? "success" : "secondary"} className="text-xs">
-                    {dst.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-                    <MoreHorizontal className="h-4 w-4" />
-                  </Button>
+            {filteredDestinations.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground text-xs sm:text-sm">
+                  No destinations found. Click <span className="font-semibold text-primary cursor-pointer underline" onClick={() => openDrawer("destination")}>Add Destination</span> to add one!
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredDestinations.map((dst) => (
+                <TableRow key={dst.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableCell className="font-semibold text-primary">{dst.name}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{dst.activePackages}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{dst.totalLeads}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{dst.bookings}</TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm">₹{(dst.revenue).toLocaleString('en-IN')}</TableCell>
+                  <TableCell>
+                    <Badge variant={dst.status === "Active" ? "success" : "secondary"} className="text-xs">
+                      {dst.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => deleteDestination(dst.id)}
+                      title="Delete Destination"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

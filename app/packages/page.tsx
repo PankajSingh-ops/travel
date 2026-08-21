@@ -1,23 +1,25 @@
 "use client";
 
 import React, { useState } from "react";
-import { Search, Filter, Plus, Copy, Eye, PenLine, PowerOff, Download } from "lucide-react";
+import { Search, Filter, Plus, Trash2, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { PACKAGES } from "@/lib/mock-data";
 import { exportToCsv } from "@/lib/export-csv";
+import { useCRM } from "@/lib/crm-store";
 
 export default function PackagesPage() {
+  const { packages, openDrawer, deletePackage } = useCRM();
   const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredPackages = PACKAGES.filter(pkg =>
+  const filteredPackages = packages.filter(pkg =>
     pkg.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleExportCsv = () => {
     exportToCsv("packages_report", filteredPackages, [
+      { header: "Package ID", key: "id" },
       { header: "Package Name", key: "name" },
       { header: "Duration", key: "duration" },
       { header: "Starting Price (INR)", key: "startingPrice", format: (v) => `₹${Number(v).toLocaleString('en-IN')}` },
@@ -38,7 +40,7 @@ export default function PackagesPage() {
           <Button variant="outline" size="sm" onClick={handleExportCsv} className="h-9">
             <Download className="mr-1.5 h-3.5 w-3.5" /> Export CSV
           </Button>
-          <Button size="sm" className="h-9 shadow-xs">
+          <Button size="sm" onClick={() => openDrawer("package")} className="h-9 shadow-xs">
             <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Package
           </Button>
         </div>
@@ -78,28 +80,39 @@ export default function PackagesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredPackages.map((pkg) => (
-              <TableRow key={pkg.id} className="cursor-pointer hover:bg-muted/50">
-                <TableCell className="font-semibold text-primary">{pkg.name}</TableCell>
-                <TableCell className="text-xs sm:text-sm">{pkg.duration}</TableCell>
-                <TableCell className="font-medium text-xs sm:text-sm">₹{(pkg.startingPrice).toLocaleString('en-IN')}</TableCell>
-                <TableCell className="text-xs sm:text-sm">{pkg.bookings}</TableCell>
-                <TableCell className="font-semibold text-success text-xs sm:text-sm">₹{(pkg.revenue).toLocaleString('en-IN')}</TableCell>
-                <TableCell>
-                  <Badge variant={pkg.status === "Active" ? "success" : "secondary"} className="text-xs">
-                    {pkg.status}
-                  </Badge>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex items-center justify-end space-x-1">
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><PenLine className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><Copy className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><Eye className="h-4 w-4" /></Button>
-                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive"><PowerOff className="h-4 w-4" /></Button>
-                  </div>
+            {filteredPackages.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={7} className="text-center py-8 text-muted-foreground text-xs sm:text-sm">
+                  No packages found. Click <span className="font-semibold text-primary cursor-pointer underline" onClick={() => openDrawer("package")}>Add Package</span> to create one!
                 </TableCell>
               </TableRow>
-            ))}
+            ) : (
+              filteredPackages.map((pkg) => (
+                <TableRow key={pkg.id} className="cursor-pointer hover:bg-muted/50">
+                  <TableCell className="font-semibold text-primary">{pkg.name}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{pkg.duration}</TableCell>
+                  <TableCell className="font-medium text-xs sm:text-sm">₹{(pkg.startingPrice).toLocaleString('en-IN')}</TableCell>
+                  <TableCell className="text-xs sm:text-sm">{pkg.bookings}</TableCell>
+                  <TableCell className="font-semibold text-success text-xs sm:text-sm">₹{(pkg.revenue).toLocaleString('en-IN')}</TableCell>
+                  <TableCell>
+                    <Badge variant={pkg.status === "Active" ? "success" : "secondary"} className="text-xs">
+                      {pkg.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => deletePackage(pkg.id)}
+                      title="Delete Package"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
