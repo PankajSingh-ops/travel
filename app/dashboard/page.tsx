@@ -43,124 +43,129 @@ const REVENUE_DATA = [
 
 export default function Dashboard() {
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between space-y-2">
+    <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-primary">Good morning, Rahul</h2>
-          <p className="text-muted-foreground">
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">Good morning, Rahul</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Here's what's happening with your travel business today.
           </p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline" className="hidden sm:flex">
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <Button variant="outline" size="sm" className="hidden sm:flex">
             <Download className="mr-2 h-4 w-4" />
             Export
           </Button>
-          <Button>
+          <Button size="sm" className="shadow-xs">
             <Plus className="mr-2 h-4 w-4" />
             New Lead
           </Button>
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card>
+      {/* KPI Cards Grid */}
+      <div className="grid gap-3 sm:gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
+        <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Total Sales</CardTitle>
             <IndianRupee className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹28.4L</div>
-            <p className="flex items-center text-xs text-success">
-              <ArrowUpRight className="mr-1 h-3 w-3" />
+            <div className="text-xl sm:text-2xl font-bold">₹28.4L</div>
+            <p className="flex items-center text-xs text-success font-medium mt-1">
+              <ArrowUpRight className="mr-1 h-3.5 w-3.5" />
               +18.6% from last month
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">New Leads</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">New Leads</CardTitle>
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">248</div>
-            <p className="flex items-center text-xs text-success">
-              <ArrowUpRight className="mr-1 h-3 w-3" />
+            <div className="text-xl sm:text-2xl font-bold">248</div>
+            <p className="flex items-center text-xs text-success font-medium mt-1">
+              <ArrowUpRight className="mr-1 h-3.5 w-3.5" />
               +12.4% from last month
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Confirmed Bookings</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Confirmed Bookings</CardTitle>
             <Briefcase className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">84</div>
-            <p className="flex items-center text-xs text-success">
-              <ArrowUpRight className="mr-1 h-3 w-3" />
+            <div className="text-xl sm:text-2xl font-bold">84</div>
+            <p className="flex items-center text-xs text-success font-medium mt-1">
+              <ArrowUpRight className="mr-1 h-3.5 w-3.5" />
               +9.2% from last month
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Pending Payments</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Pending Payments</CardTitle>
             <Clock className="h-4 w-4 text-destructive" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-destructive">₹6.2L</div>
-            <p className="flex items-center text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold text-destructive">₹6.2L</div>
+            <p className="flex items-center text-xs text-muted-foreground mt-1">
               12 invoices overdue
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Conversion Rate</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Conversion Rate</CardTitle>
             <Target className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">18.7%</div>
-            <p className="flex items-center text-xs text-success">
-              <ArrowUpRight className="mr-1 h-3 w-3" />
+            <div className="text-xl sm:text-2xl font-bold">18.7%</div>
+            <p className="flex items-center text-xs text-success font-medium mt-1">
+              <ArrowUpRight className="mr-1 h-3.5 w-3.5" />
               +2.4% from last month
             </p>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="shadow-xs">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Expected Revenue</CardTitle>
+            <CardTitle className="text-xs sm:text-sm font-medium text-muted-foreground">Expected Revenue</CardTitle>
             <TrendingUp className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹11.8L</div>
-            <p className="flex items-center text-xs text-muted-foreground">
+            <div className="text-xl sm:text-2xl font-bold">₹11.8L</div>
+            <p className="flex items-center text-xs text-muted-foreground mt-1">
               From active opportunities
             </p>
           </CardContent>
         </Card>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Revenue Overview</CardTitle>
-            <CardDescription>
+      {/* Main Charts & Funnel Grid */}
+      <div className="grid gap-4 grid-cols-1 lg:grid-cols-7">
+        <Card className="col-span-1 lg:col-span-4 shadow-xs">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="text-base sm:text-lg">Revenue Overview</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               Your business performance across all destinations.
             </CardDescription>
           </CardHeader>
-          <CardContent className="pl-2">
+          <CardContent className="p-2 sm:p-6 pt-0">
             <Tabs defaultValue="revenue" className="w-full">
-              <TabsList className="mb-4 ml-4">
-                <TabsTrigger value="revenue">Revenue</TabsTrigger>
-                <TabsTrigger value="bookings">Bookings</TabsTrigger>
-                <TabsTrigger value="profit">Profit</TabsTrigger>
-                <TabsTrigger value="leads">Leads</TabsTrigger>
-              </TabsList>
-              <TabsContent value="revenue" className="h-[350px] w-full">
+              <div className="overflow-x-auto scrollbar-hide py-1">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="revenue" className="text-xs sm:text-sm">Revenue</TabsTrigger>
+                  <TabsTrigger value="bookings" className="text-xs sm:text-sm">Bookings</TabsTrigger>
+                  <TabsTrigger value="profit" className="text-xs sm:text-sm">Profit</TabsTrigger>
+                  <TabsTrigger value="leads" className="text-xs sm:text-sm">Leads</TabsTrigger>
+                </TabsList>
+              </div>
+              <TabsContent value="revenue" className="h-[280px] sm:h-[350px] w-full">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={REVENUE_DATA} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <AreaChart data={REVENUE_DATA} margin={{ top: 10, right: 10, left: -15, bottom: 0 }}>
                     <defs>
                       <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="var(--color-primary)" stopOpacity={0.3}/>
@@ -168,10 +173,10 @@ export default function Dashboard() {
                       </linearGradient>
                     </defs>
                     <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border)" />
-                    <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={12} tickLine={false} axisLine={false} />
+                    <XAxis dataKey="name" stroke="var(--color-muted-foreground)" fontSize={11} tickLine={false} axisLine={false} />
                     <YAxis 
                       stroke="var(--color-muted-foreground)" 
-                      fontSize={12} 
+                      fontSize={11} 
                       tickLine={false} 
                       axisLine={false}
                       tickFormatter={(value) => `₹${value / 100000}L`}
@@ -180,7 +185,7 @@ export default function Dashboard() {
                       contentStyle={{ backgroundColor: 'var(--color-card)', borderColor: 'var(--color-border)', borderRadius: '8px' }}
                       itemStyle={{ color: 'var(--color-foreground)' }}
                     />
-                    <Area type="monotone" dataKey="revenue" stroke="var(--color-primary)" strokeWidth={3} fillOpacity={1} fill="url(#colorRevenue)" />
+                    <Area type="monotone" dataKey="revenue" stroke="var(--color-primary)" strokeWidth={2.5} fillOpacity={1} fill="url(#colorRevenue)" />
                   </AreaChart>
                 </ResponsiveContainer>
               </TabsContent>
@@ -188,36 +193,39 @@ export default function Dashboard() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Sales Funnel</CardTitle>
-            <CardDescription>
+        <Card className="col-span-1 lg:col-span-3 shadow-xs">
+          <CardHeader className="p-4 sm:p-6 pb-2">
+            <CardTitle className="text-base sm:text-lg">Sales Funnel</CardTitle>
+            <CardDescription className="text-xs sm:text-sm">
               Lead conversion tracking this month.
             </CardDescription>
           </CardHeader>
-          <CardContent>
-            <div className="space-y-6">
+          <CardContent className="p-4 sm:p-6 pt-2">
+            <div className="space-y-4 sm:space-y-5">
               {[
                 { stage: "New Leads", count: 248, amount: "₹4.2Cr", color: "bg-blue-500", percent: "100%" },
                 { stage: "Contacted", count: 182, amount: "₹3.1Cr", color: "bg-indigo-500", percent: "73%" },
-                { stage: "Requirement Collected", count: 145, amount: "₹2.8Cr", color: "bg-purple-500", percent: "58%" },
+                { stage: "Req. Collected", count: 145, amount: "₹2.8Cr", color: "bg-purple-500", percent: "58%" },
                 { stage: "Quotation Sent", count: 112, amount: "₹2.1Cr", color: "bg-pink-500", percent: "45%" },
                 { stage: "Negotiation", count: 64, amount: "₹1.1Cr", color: "bg-orange-500", percent: "25%" },
                 { stage: "Advance Paid", count: 42, amount: "₹72L", color: "bg-amber-500", percent: "16%" },
                 { stage: "Booked", count: 38, amount: "₹65L", color: "bg-success", percent: "15%" },
               ].map((step, i) => (
-                <div key={i} className="flex items-center">
-                  <div className="w-[120px] text-sm font-medium">{step.stage}</div>
-                  <div className="flex-1 px-4">
-                    <div className="h-4 w-full rounded-full bg-muted overflow-hidden">
+                <div key={i} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2">
+                  <div className="flex items-center justify-between sm:w-[120px] text-xs sm:text-sm font-medium">
+                    <span>{step.stage}</span>
+                    <span className="sm:hidden text-xs text-muted-foreground">{step.count} ({step.amount})</span>
+                  </div>
+                  <div className="flex-1 py-1">
+                    <div className="h-3 sm:h-3.5 w-full rounded-full bg-muted overflow-hidden">
                       <div 
-                        className={`h-full ${step.color} transition-all`} 
+                        className={`h-full ${step.color} transition-all rounded-full`} 
                         style={{ width: step.percent }}
                       ></div>
                     </div>
                   </div>
-                  <div className="w-[80px] text-right text-sm text-muted-foreground">{step.count}</div>
-                  <div className="w-[80px] text-right text-sm font-medium">{step.amount}</div>
+                  <div className="hidden sm:block w-[50px] text-right text-xs text-muted-foreground">{step.count}</div>
+                  <div className="hidden sm:block w-[70px] text-right text-xs font-semibold">{step.amount}</div>
                 </div>
               ))}
             </div>

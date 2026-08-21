@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { Search, Filter, Download, Plus, MoreHorizontal } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,31 +9,53 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { BOOKINGS } from "@/lib/mock-data";
 
 export default function BookingsPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredBookings = BOOKINGS.filter(b =>
+    b.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    b.destination.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    b.id.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between">
+    <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-primary">Bookings</h2>
-          <p className="text-muted-foreground">Manage your confirmed trips and revenue.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">Bookings</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">Manage your confirmed trips and revenue.</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button variant="outline"><Download className="mr-2 h-4 w-4" /> Export</Button>
-          <Button><Plus className="mr-2 h-4 w-4" /> New Booking</Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <Button variant="outline" size="sm" className="hidden sm:flex">
+            <Download className="mr-1.5 h-3.5 w-3.5" /> Export
+          </Button>
+          <Button size="sm" className="shadow-xs">
+            <Plus className="mr-1.5 h-3.5 w-3.5" /> New Booking
+          </Button>
         </div>
       </div>
 
-      <div className="rounded-lg border bg-card">
-        <div className="flex items-center justify-between p-4 border-b">
-          <div className="flex flex-1 items-center space-x-2">
-            <div className="relative w-72">
+      <div className="rounded-lg border bg-card shadow-xs overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-3 sm:p-4 border-b gap-3">
+          <div className="flex flex-1 items-center gap-2">
+            <div className="relative flex-1 sm:w-72 sm:flex-initial">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search bookings..." className="pl-8" />
+              <Input 
+                placeholder="Search bookings..." 
+                className="pl-8 text-xs sm:text-sm h-9" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <Button variant="outline" size="sm" className="h-10"><Filter className="mr-2 h-4 w-4" /> Filters</Button>
+            <Button variant="outline" size="sm" className="h-9 shrink-0">
+              <Filter className="mr-1.5 h-3.5 w-3.5" /> Filters
+            </Button>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Showing {filteredBookings.length} bookings
           </div>
         </div>
         
-        <Table>
+        <Table className="min-w-[800px]">
           <TableHeader>
             <TableRow>
               <TableHead>Booking ID</TableHead>
@@ -47,24 +69,26 @@ export default function BookingsPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {BOOKINGS.map((booking) => (
+            {filteredBookings.map((booking) => (
               <TableRow key={booking.id} className="cursor-pointer hover:bg-muted/50">
-                <TableCell className="font-medium text-primary">{booking.id}</TableCell>
+                <TableCell className="font-semibold text-primary">{booking.id}</TableCell>
                 <TableCell className="font-medium">{booking.customerName}</TableCell>
                 <TableCell>{booking.destination}</TableCell>
-                <TableCell className="text-sm">{booking.travelDates}</TableCell>
+                <TableCell className="text-xs text-muted-foreground">{booking.travelDates}</TableCell>
                 <TableCell>
                   <div className="font-medium">₹{(booking.amount).toLocaleString('en-IN')}</div>
-                  <div className="text-xs text-muted-foreground">Pending: ₹{(booking.pending).toLocaleString('en-IN')}</div>
+                  <div className="text-[11px] text-muted-foreground">Pending: ₹{(booking.pending).toLocaleString('en-IN')}</div>
                 </TableCell>
                 <TableCell>
-                  <Badge variant={booking.status === "Confirmed" ? "success" : "warning"}>
+                  <Badge variant={booking.status === "Confirmed" ? "success" : "warning"} className="text-xs">
                     {booking.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{booking.assignedTo}</TableCell>
+                <TableCell className="text-xs">{booking.assignedTo}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button>
+                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}

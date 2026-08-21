@@ -1,7 +1,7 @@
 "use client";
 
-import React from "react";
-import { Search, Filter, Plus, MoreHorizontal, Copy, Eye, PenLine, PowerOff } from "lucide-react";
+import React, { useState } from "react";
+import { Search, Filter, Plus, Copy, Eye, PenLine, PowerOff } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -9,30 +9,48 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { PACKAGES } from "@/lib/mock-data";
 
 export default function PackagesPage() {
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const filteredPackages = PACKAGES.filter(pkg =>
+    pkg.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
-    <div className="flex-1 space-y-4 p-8 pt-6">
-      <div className="flex items-center justify-between">
+    <div className="flex-1 space-y-4 p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-primary">Travel Packages</h2>
-          <p className="text-muted-foreground">Manage your predefined travel itineraries and pricing.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">Travel Packages</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">Manage your predefined travel itineraries and pricing.</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <Button><Plus className="mr-2 h-4 w-4" /> Add Package</Button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <Button size="sm" className="shadow-xs">
+            <Plus className="mr-1.5 h-3.5 w-3.5" /> Add Package
+          </Button>
         </div>
       </div>
 
-      <div className="rounded-lg border bg-card">
-        <div className="flex items-center justify-between p-4 border-b">
-          <div className="flex flex-1 items-center space-x-2">
-            <div className="relative w-72">
+      <div className="rounded-lg border bg-card shadow-xs overflow-hidden">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-3 sm:p-4 border-b gap-3">
+          <div className="flex flex-1 items-center gap-2">
+            <div className="relative flex-1 sm:w-72 sm:flex-initial">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search packages..." className="pl-8" />
+              <Input 
+                placeholder="Search packages..." 
+                className="pl-8 text-xs sm:text-sm h-9" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
             </div>
-            <Button variant="outline" size="sm" className="h-10"><Filter className="mr-2 h-4 w-4" /> Filters</Button>
+            <Button variant="outline" size="sm" className="h-9 shrink-0">
+              <Filter className="mr-1.5 h-3.5 w-3.5" /> Filters
+            </Button>
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Showing {filteredPackages.length} packages
           </div>
         </div>
         
-        <Table>
+        <Table className="min-w-[800px]">
           <TableHeader>
             <TableRow>
               <TableHead>Package Name</TableHead>
@@ -45,20 +63,20 @@ export default function PackagesPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {PACKAGES.map((pkg) => (
+            {filteredPackages.map((pkg) => (
               <TableRow key={pkg.id} className="cursor-pointer hover:bg-muted/50">
-                <TableCell className="font-medium text-primary">{pkg.name}</TableCell>
-                <TableCell>{pkg.duration}</TableCell>
-                <TableCell className="font-medium">₹{(pkg.startingPrice).toLocaleString('en-IN')}</TableCell>
-                <TableCell>{pkg.bookings}</TableCell>
-                <TableCell className="font-medium text-success">₹{(pkg.revenue).toLocaleString('en-IN')}</TableCell>
+                <TableCell className="font-semibold text-primary">{pkg.name}</TableCell>
+                <TableCell className="text-xs sm:text-sm">{pkg.duration}</TableCell>
+                <TableCell className="font-medium text-xs sm:text-sm">₹{(pkg.startingPrice).toLocaleString('en-IN')}</TableCell>
+                <TableCell className="text-xs sm:text-sm">{pkg.bookings}</TableCell>
+                <TableCell className="font-semibold text-success text-xs sm:text-sm">₹{(pkg.revenue).toLocaleString('en-IN')}</TableCell>
                 <TableCell>
-                  <Badge variant={pkg.status === "Active" ? "success" : "secondary"}>
+                  <Badge variant={pkg.status === "Active" ? "success" : "secondary"} className="text-xs">
                     {pkg.status}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex items-center justify-end space-x-2">
+                  <div className="flex items-center justify-end space-x-1">
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><PenLine className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><Copy className="h-4 w-4" /></Button>
                     <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground"><Eye className="h-4 w-4" /></Button>

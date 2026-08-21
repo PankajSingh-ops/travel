@@ -40,11 +40,11 @@ function SortableLeadCard({ lead }: { lead: any }) {
       style={style} 
       {...attributes} 
       {...listeners} 
-      className="mb-3 cursor-grab rounded-lg border bg-card p-4 shadow-sm active:cursor-grabbing hover:border-primary/50 transition-colors"
+      className="mb-3 cursor-grab rounded-lg border bg-card p-3 sm:p-4 shadow-xs active:cursor-grabbing hover:border-primary/50 transition-colors"
     >
       <div className="mb-2 flex items-start justify-between">
-        <h4 className="font-semibold">{lead.customerName}</h4>
-        <Button variant="ghost" size="icon" className="h-6 w-6 -mr-2 -mt-2 text-muted-foreground">
+        <h4 className="font-semibold text-sm">{lead.customerName}</h4>
+        <Button variant="ghost" size="icon" className="h-6 w-6 -mr-1 -mt-1 text-muted-foreground">
           <MoreHorizontal className="h-4 w-4" />
         </Button>
       </div>
@@ -76,39 +76,39 @@ export default function PipelinePage() {
   );
 
   return (
-    <div className="flex h-[calc(100vh-4rem)] flex-col p-8 pt-6">
-      <div className="mb-6 flex items-center justify-between">
+    <div className="flex h-[calc(100vh-4rem)] flex-col p-4 sm:p-6 md:p-8 pt-4 sm:pt-6">
+      <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-bold tracking-tight text-primary">Sales Pipeline</h2>
-          <p className="text-muted-foreground">Drag and drop leads to update their stages.</p>
+          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-primary">Sales Pipeline</h2>
+          <p className="text-xs sm:text-sm text-muted-foreground">Drag and drop leads to update their stages.</p>
         </div>
-        <div className="flex items-center space-x-2">
-          <div className="relative w-64 hidden md:block">
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <div className="relative w-48 sm:w-64 hidden sm:block">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input placeholder="Search pipeline..." className="pl-8 bg-card" />
+            <Input placeholder="Search pipeline..." className="pl-8 bg-card h-9 text-xs sm:text-sm" />
           </div>
-          <Button variant="outline">
-            <Filter className="mr-2 h-4 w-4" />
+          <Button variant="outline" size="sm" className="h-9">
+            <Filter className="mr-1.5 h-3.5 w-3.5" />
             Filters
           </Button>
-          <Button>
-            <Plus className="mr-2 h-4 w-4" />
+          <Button size="sm" className="h-9 shadow-xs">
+            <Plus className="mr-1.5 h-3.5 w-3.5" />
             New Deal
           </Button>
         </div>
       </div>
 
       <div className="flex-1 overflow-x-auto overflow-y-hidden scrollbar-hide">
-        <div className="flex h-full gap-4 pb-4 px-1" style={{ width: "max-content" }}>
+        <div className="flex h-full gap-3 sm:gap-4 pb-4 px-1" style={{ width: "max-content" }}>
           {PIPELINE_STAGES.map((stage) => {
             const stageLeads = leads.filter(l => l.stage === stage);
             const totalValue = stageLeads.reduce((sum, l) => sum + l.budget, 0);
 
             return (
-              <div key={stage} className="flex h-full w-[320px] flex-col rounded-xl bg-muted/40 p-3">
-                <div className="mb-3 flex items-center justify-between px-1">
-                  <h3 className="font-semibold text-sm">{stage}</h3>
-                  <Badge variant="secondary" className="bg-muted text-muted-foreground">
+              <div key={stage} className="flex h-full w-[280px] sm:w-[320px] flex-col rounded-xl bg-muted/40 p-3">
+                <div className="mb-2 sm:mb-3 flex items-center justify-between px-1">
+                  <h3 className="font-semibold text-xs sm:text-sm">{stage}</h3>
+                  <Badge variant="secondary" className="bg-muted text-muted-foreground text-xs">
                     {stageLeads.length}
                   </Badge>
                 </div>
